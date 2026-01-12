@@ -14,9 +14,20 @@ app.use(express.json());
 app.use('/api/v1', inventoryRoutes);
 
 app.get('/', (req, res) => {
-    res.send('Servidor del inventario de Alimentos Activo 🚀');
+  res.send('Servidor del inventario de Alimentos Activo 🚀');
 });
 
-app.listen(PORT, ()=>{
-    console.log(`Server running on port: ${PORT}`);
-})
+// Middleware básico de registro (Log) para ver qué peticiones llegan
+app.use((req, res, next) => {
+  console.log(
+    `${new Date().toISOString()} - ${req.method} request to ${req.url}`
+  );
+  next();
+});
+app.use((req, res) => {
+  res.status(404).json({ message: 'Ruta no encontrada' });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port: ${PORT}`);
+});
