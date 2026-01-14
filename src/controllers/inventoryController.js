@@ -1,28 +1,50 @@
-let inventory = [
-  { id: 1, name: "Arroz", quantity: 50, unit: "kg" },
-  { id: 2, name: "Leche", quantity: 20, unit: "litros" },
-  { id: 3, name: "Harina de Trigo", quantity: 50, unit: "Kg" },
-];
+import { InventoryModel } from '../models/inventoryModel.js';
 
-export const getItems = (req, res) => {
-  res.status(200).json(inventory);
-};
-export const getItemById = (req, res) => {
-  const item = inventory.find((i) => i.id === parseInt(req.params.id));
-  if (!item) return res.status(404).json({ message: "Producto no encontrado" });
-  res.json(item);
-};
-export const addItem = (req, res) => {
-  const { name, quantity, unit } = req.body;
-  if (!name || !quantity) {
-    return res.status(400).json({ message: "Faltan campos obligatorios" });
+export const getItems = async (req, res, next) => {
+  try {
+    const items = await InventoryModel.findAll();
+    res.status(200).json(items);
+  } catch (error) {
+    next(error); // Pasa el error al middleware de errores
   }
-  const newItem = { id: inventory.length + 1, name, quantity, unit };
-  inventory.push(newItem);
-  res.status(201).json(newItem);
 };
 
-export const deleteItem = (req, res) => {
-  inventory = inventory.filter((i) => i.id !== parseInt(req.params.id));
-  res.status(204).send(); // 204 significa "No Content", éxito pero sin respuesta visual
+export const getItemById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const item = await InventoryModel.findById(parseInt(id));
+
+    if (!item) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+    res.json(item);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addItem = async (req, res, next) => {
+  try {
+    // Asumimos que el middleware de validación ya revisó el body
+    const newItem = await InventoryModel.create(req.body);
+    res.status(201).json(newItem);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteItem = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deleted = await InventoryModel.delete(parseInt(id));
+
+    if (!deleted) {
+      return res
+        .status(404)
+        .json({ message: 'No se pudo eliminar: ID no encontrado' });
+    }
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
 };
