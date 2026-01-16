@@ -1,14 +1,19 @@
 import express, { json } from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import inventoryRoutes from './routes/inventoryRoutes.js';
+import { requestLogger } from './middlewares/requestLogger.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-//Middleware
-app.use(express.json());
+// --- 1. Middlewares Globales ---
+app.use(cors()); // Permite peticiones desde otros dominios
+app.use(express.json()); // Parsea Body JSON
+app.use(requestLogger); // Log de peticiones
 
 // Prefijo para la API
 app.use('/api/v1', inventoryRoutes);
@@ -17,16 +22,14 @@ app.get('/', (req, res) => {
   res.send('Servidor del inventario de Alimentos Activo 🚀');
 });
 
-// Middleware básico de registro (Log) para ver qué peticiones llegan
-app.use((req, res, next) => {
-  console.log(
-    `${new Date().toISOString()} - ${req.method} request to ${req.url}`
-  );
-  next();
-});
+// --- 3. Manejo de Errores ---
+// Middleware de 404 (Ruta no encontrada)
 app.use((req, res) => {
   res.status(404).json({ message: 'Ruta no encontrada' });
 });
+
+// Middleware de Errores Generales (Siempre va al final)
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port: ${PORT}`);
