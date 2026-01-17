@@ -5,7 +5,7 @@ import {
   getItemById,
   deleteItem,
 } from "../controllers/inventoryController.js";
-import { validateProduct } from "../middleware/validateInventory.js";
+import { validateProduct } from "../middlewares/validateInventory.js";
 
 const router = express.Router();
 

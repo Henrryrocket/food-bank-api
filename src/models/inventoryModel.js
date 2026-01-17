@@ -4,7 +4,7 @@ let database = [
   { id: 2, name: 'Leche', quantity: 20, unit: 'litros' },
 ];
 
-export const inventoryModel = {
+export const InventoryModel = {
   findAll: async () => {
     return database;
   },
