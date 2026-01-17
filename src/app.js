@@ -4,10 +4,12 @@ import cors from 'cors';
 import inventoryRoutes from './routes/inventoryRoutes.js';
 import { requestLogger } from './middlewares/requestLogger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { connectDB } from './config/database.js';
 
 dotenv.config();
 
 const app = express();
+connectDB();
 const PORT = process.env.PORT || 3000;
 
 // --- 1. Middlewares Globales ---
